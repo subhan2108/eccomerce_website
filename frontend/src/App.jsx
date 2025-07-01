@@ -1,14 +1,21 @@
-import { useEffect } from 'react';
-import axios from 'axios';
+import { Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import ProductDetail from './pages/ProductDetail'
+import Navbar from './components/Navbar'
 
-function App() {
-  useEffect(() => {
-    axios.get('http://127.0.0.1:8000/api/products/')
-      .then(res => console.log(res.data))
-      .catch(err => console.error(err));
-  }, []);
-
-  return <h1>Hello from Vite + React</h1>;
+export default function App() {
+  return (
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/login" element={<div>Login Page (coming soon)</div>} />
+        <Route path="/register" element={<div>Register Page (coming soon)</div>} />
+      </Routes>
+    </>
+  )
 }
 
-export default App;
+
+

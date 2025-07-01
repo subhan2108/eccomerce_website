@@ -17,3 +17,13 @@ def order_list(request):
     orders = Order.objects.all()
     serializer = OrderSerializer(orders, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def product_detail(request, pk):
+    try:
+        product = Product.objects.get(pk=pk)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
+    except Product.DoesNotExist:
+        return Response({'error': 'Not found'}, status=404)
