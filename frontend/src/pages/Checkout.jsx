@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import '../App.css'
+
 export default function Checkout() {
   const { cartItems, clearCart } = useCart()
   const navigate = useNavigate()
@@ -14,6 +15,8 @@ export default function Checkout() {
     state: '',
     zip: ''
   })
+
+  const [loading, setLoading] = useState(false)
 
   const total = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -34,9 +37,9 @@ export default function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true)
 
     const shipping = `${form.name}, ${form.phone}, ${form.city}, ${form.state}, ${form.zip}`
-
     const items = cartItems.map(item => ({
       product: item.id,
       quantity: item.quantity,
@@ -75,6 +78,8 @@ export default function Checkout() {
     } catch (err) {
       console.error('❌ Order failed:', err.response?.data || err.message)
       alert('❌ Failed to place order. Check console for details.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -101,10 +106,11 @@ export default function Checkout() {
         </ul>
         <p><strong>Total: ₹{total}</strong></p>
 
-        <button type="submit" style={{ marginTop: '1rem' }}>
-          Place Order
+        <button type="submit" style={{ marginTop: '1rem' }} disabled={loading}>
+          {loading ? 'Placing Order...' : 'Place Order'}
         </button>
       </form>
     </div>
   )
 }
+
