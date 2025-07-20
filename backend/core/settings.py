@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
-
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -140,3 +140,21 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     )
 }
+
+RAZORPAY_KEY_ID = 'your_public_key'
+RAZORPAY_KEY_SECRET = 'your_secret_key'
+
+
+# settings.py
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'sk1623969@gmail.com'
+EMAIL_HOST_PASSWORD = 'jagb ffpu alws fkuq'  # Not your Gmail password!
+DEFAULT_FROM_EMAIL = 'Watch Store <your_email@gmail.com>'

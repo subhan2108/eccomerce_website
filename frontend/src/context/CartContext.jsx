@@ -22,8 +22,17 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => setCartItems([])
 
+   // ✅ Add this:
+  const updateQuantity = (id, qty) => {
+    setCartItems(prev =>
+      prev.map(item =>
+        item.id === id ? { ...item, quantity: qty } : item
+      )
+    )
+  }
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, clearCart, updateQuantity }}>
       {children}
     </CartContext.Provider>
   )

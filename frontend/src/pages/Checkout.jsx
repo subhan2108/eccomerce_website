@@ -2,7 +2,7 @@ import { useCart } from '../context/CartContext'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-
+import '../App.css'
 export default function Checkout() {
   const { cartItems, clearCart } = useCart()
   const navigate = useNavigate()
@@ -20,7 +20,6 @@ export default function Checkout() {
     0
   )
 
-  // Redirect to login if not authenticated
   useEffect(() => {
     const token = localStorage.getItem('access')
     if (!token) {
@@ -48,7 +47,6 @@ export default function Checkout() {
     const refresh = localStorage.getItem('refresh')
 
     try {
-      // Refresh token if needed
       const res = await axios.post('http://127.0.0.1:8000/api/token/refresh/', { refresh })
       token = res.data.access
       localStorage.setItem('access', token)
@@ -60,12 +58,7 @@ export default function Checkout() {
       return
     }
 
-    // ✅ Submit order
     try {
-
-      console.log("📦 Items sent:", items)
-      console.log("📬 Shipping sent:", shipping)
-
       await axios.post('http://127.0.0.1:8000/api/create-order/', {
         shipping,
         items
@@ -78,7 +71,7 @@ export default function Checkout() {
 
       alert('✅ Order placed successfully!')
       clearCart()
-      navigate('/order-success')  // You can create this route
+      navigate('/order-success')
     } catch (err) {
       console.error('❌ Order failed:', err.response?.data || err.message)
       alert('❌ Failed to place order. Check console for details.')
@@ -92,42 +85,11 @@ export default function Checkout() {
       <form onSubmit={handleSubmit}>
         <h3>Shipping Information</h3>
 
-        <input
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          required
-          placeholder="Full Name"
-        />
-        <input
-          name="phone"
-          type="tel"
-          value={form.phone}
-          onChange={handleChange}
-          required
-          placeholder="Phone"
-        />
-        <input
-          name="city"
-          value={form.city}
-          onChange={handleChange}
-          required
-          placeholder="City"
-        />
-        <input
-          name="state"
-          value={form.state}
-          onChange={handleChange}
-          required
-          placeholder="State"
-        />
-        <input
-          name="zip"
-          value={form.zip}
-          onChange={handleChange}
-          required
-          placeholder="ZIP Code"
-        />
+        <input name="name" value={form.name} onChange={handleChange} required placeholder="Full Name" />
+        <input name="phone" type="tel" value={form.phone} onChange={handleChange} required placeholder="Phone" />
+        <input name="city" value={form.city} onChange={handleChange} required placeholder="City" />
+        <input name="state" value={form.state} onChange={handleChange} required placeholder="State" />
+        <input name="zip" value={form.zip} onChange={handleChange} required placeholder="ZIP Code" />
 
         <h3>Order Summary</h3>
         <ul>
@@ -146,4 +108,3 @@ export default function Checkout() {
     </div>
   )
 }
-
