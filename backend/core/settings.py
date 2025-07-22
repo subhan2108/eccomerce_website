@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from decouple import config
 import os
-import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -162,17 +162,3 @@ DEFAULT_FROM_EMAIL = 'Watch Store <your_email@gmail.com>'
 
 
 
-DEBUG = False
-ALLOWED_HOSTS = ['your-backend-domain.com', 'your-vercel-site.vercel.app']
-
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-DATABASES = {
-    'default': dj_database_url.config(default=config('DATABASE_URL'))
-}
