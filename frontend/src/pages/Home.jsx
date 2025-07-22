@@ -48,7 +48,7 @@ export default function Home() {
 
 
   return (
-    <>
+    <> 
       {/* 🎯 Banner */}
       <div  style={{ overflow: 'hidden', position: 'relative', height: '500px', marginBottom: '2rem' }}>
         <img

@@ -1,5 +1,7 @@
 from django.shortcuts import render
-
+import razorpay
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 # Create your views here.
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
@@ -17,6 +19,10 @@ from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from .utils.email import send_order_email
+import json
+import hmac
+import hashlib
+from django.http import JsonResponse
 
 
 @api_view(['GET'])
@@ -230,7 +236,6 @@ def review_detail(request, review_id):
     
     
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_order(request):
@@ -238,13 +243,33 @@ def create_order(request):
     data = request.data
     shipping = data.get('shipping')
     items = data.get('items')
+    payment_id = data.get('payment_id')
+    razorpay_order_id = data.get('razorpay_order_id')
 
     if not items or not shipping:
-        return Response({'error': 'Missing fields'}, status=400)
+        return Response({'error': 'Missing items or shipping info'}, status=400)
 
     try:
+        # Validate shipping fields
+        required_fields = ['name', 'phone', 'address', 'city', 'state', 'zip', 'country']
+        for field in required_fields:
+            if field not in shipping:
+                return Response({'error': f'Missing shipping field: {field}'}, status=400)
+
+        # Create Order
         order = Order.objects.create(user=user, status='success')
 
+        # Save Shipping Address
+        ShippingAddress.objects.create(
+            order=order,
+            address=shipping['address'],
+            city=shipping['city'],
+            postal_code=shipping['zip'],
+            country=shipping['country'],
+            phone=shipping['phone']
+        )
+
+        # Save Order Items
         for item in items:
             product = Product.objects.get(id=item['product'])
             OrderItem.objects.create(
@@ -254,21 +279,19 @@ def create_order(request):
                 price=item['price']
             )
 
+        # Send emails
         send_order_email(
             subject='🛒 Order Placed Successfully!',
-            message=f'Thank you for your order #{order.id}. We’ll notify you when it ships.',
-            to_email=request.user.email
-        )
-
-        send_order_email(
-            subject='📦 Order Dispatched!',
-            message=f'Good news! Your order #{order.id} has been dispatched.',
-            to_email=order.user.email
+            message=f'Thank you for your order #{order.id}.',
+            to_email=user.email
         )
 
         return Response({'message': 'Order created'}, status=201)
+
     except Exception as e:
         return Response({'error': str(e)}, status=500)
+
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -277,3 +300,65 @@ def current_user(request):
         'username': request.user.username,
         'email': request.user.email,
     })
+
+
+@api_view(['POST'])
+def create_razorpay_order(request):
+    client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    amount = request.data.get('amount') * 100  # convert to paise
+
+    data = {
+        "amount": int(amount),
+        "currency": "INR",
+        "payment_capture": 1
+    }
+
+    razorpay_order = client.order.create(data=data)
+    return Response({
+        "order_id": razorpay_order['id'],
+        "key": settings.RAZORPAY_KEY_ID,
+        "amount": amount
+    })
+
+@csrf_exempt
+@api_view(['POST'])
+def verify_payment(request):
+    data = request.data
+    try:
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+        params_dict = {
+            'razorpay_order_id': data['razorpay_order_id'],
+            'razorpay_payment_id': data['razorpay_payment_id'],
+            'razorpay_signature': data['razorpay_signature']
+        }
+
+        client.utility.verify_payment_signature(params_dict)
+
+        # ✅ If no exception, it's a valid payment
+        # You can now mark order as paid in DB
+        return Response({"status": "success"})
+    except razorpay.errors.SignatureVerificationError:
+        return Response({"status": "failure"}, status=400)
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_razorpay_order(request):
+    try:
+        amount = request.data.get('amount')
+        if not amount:
+            return JsonResponse({'error': 'Amount is required'}, status=400)
+
+        client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+        razorpay_order = client.order.create({
+            "amount": int(amount),  # Amount in paise
+            "currency": "INR",
+            "payment_capture": 1
+        })
+
+        return JsonResponse(razorpay_order, safe=False)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

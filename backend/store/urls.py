@@ -22,6 +22,7 @@ urlpatterns = [
     path('products/<int:product_id>/reviews/',views.product_reviews, name='product_reviews'),
     path('reviews/<int:review_id>/', review_detail),
     path('user/', current_user),
+    path('create-razorpay-order/', views.create_razorpay_order, name='create_razorpay_order'),
 
 
 ]

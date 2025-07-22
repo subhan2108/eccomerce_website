@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from decouple import config
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -141,8 +142,8 @@ REST_FRAMEWORK = {
     )
 }
 
-RAZORPAY_KEY_ID = 'your_public_key'
-RAZORPAY_KEY_SECRET = 'your_secret_key'
+RAZORPAY_KEY_ID = 'rzp_test_sT2i7yt5Zlgyii'
+RAZORPAY_KEY_SECRET = 'UEZUtTBgVIegWDkWNXtzlSll'
 
 
 # settings.py
@@ -158,3 +159,20 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'sk1623969@gmail.com'
 EMAIL_HOST_PASSWORD = 'jagb ffpu alws fkuq'  # Not your Gmail password!
 DEFAULT_FROM_EMAIL = 'Watch Store <your_email@gmail.com>'
+
+
+
+DEBUG = False
+ALLOWED_HOSTS = ['your-backend-domain.com', 'your-vercel-site.vercel.app']
+
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+DATABASES = {
+    'default': dj_database_url.config(default=config('DATABASE_URL'))
+}

@@ -64,6 +64,8 @@ class ShippingAddress(models.Model):
     city = models.CharField(max_length=100)
     postal_code = models.CharField(max_length=20)
     country = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20, default='unknown')# ✅ NEW FIELD
+    state = models.CharField(max_length=100, default='unknown')  # ✅ Newly added
 
     def __str__(self):
         return self.address
