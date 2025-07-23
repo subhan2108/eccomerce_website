@@ -3,3 +3,5 @@ whitenoise
 dj-database-url
 python-decouple
 django-cors-headers
+djangorestframework
+psycopg2-binary
