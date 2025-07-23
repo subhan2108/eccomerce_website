@@ -102,8 +102,8 @@ REST_FRAMEWORK = {
 }
 
 # Razorpay
-RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID')
-RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET')
+RAZORPAY_KEY_ID =  'rzp_test_sT2i7yt5Zlgyii'
+RAZORPAY_KEY_SECRET = 'UEZUtTBgVIegWDkWNXtzlSll'
 
 # Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
