@@ -3,6 +3,7 @@ import axios from 'axios'
 import { Link } from 'react-router-dom'
 import '../App.css'  // Ensure this includes the dark theme styles
 import { useLocation } from 'react-router-dom';
+import api from '../axios';
 
 export default function Home() {
   const [products, setProducts] = useState([])
@@ -13,7 +14,7 @@ export default function Home() {
   const categories = ['All', 'Men', 'Women', 'Luxury', 'Smart']
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/api/products/')
+    axios.get('/products/')
       .then(res => {
         setProducts(res.data)
         setFilteredProducts(res.data)
